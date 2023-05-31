@@ -5,12 +5,14 @@ from tkinter import *
 import time
 import random
 import sqlite3
-import json
+from functools import *
+import requests
 
 message = ""
 response = ""
 
 conn, cursor = "", ""
+
 
 def start_server():
     global message, response, ID
@@ -57,6 +59,7 @@ def posalji_serveru():
     conn.execute("INSERT INTO COMPANY (NAME) VALUES (?)", (message,))
     conn.commit()
 
+
 def ucitaj_od_servera(listBox2, listBox):
     listBox2.insert(1, message)
     listBox.insert(1, response)
@@ -69,24 +72,10 @@ def kreirajSql_upit():
     file_path = "test.txt"
     file = open(file_path, "a")
     for row in rows:
-        file.write(str(row)+"\n")
+        file.write(str(row) + "\n")
     file.close()
     cursor.close()
     conn.close()
-def Json():
-    data = {
-        "name": "John",
-        "age": 30,
-        "city": "New York"
-    }
-
-    json_data = json.dumps(data)
-    print(json_data)
-    json_data = '{"name": "John", "age": 30, "city": "New York"}'
-    data = json.loads(json_data)
-    print(data["name"])
-    print(data["age"])
-    print(data["city"])
 
 
 class Prozor():
@@ -125,6 +114,61 @@ class Prozor():
         btn3 = Button(frame2, text="KreirajSqlIDatoteku", command=kreirajSql_upit)
         btn3.pack(side=RIGHT)
 
+        frame3 = Frame(root, width=300, height=100, bg="yellow")
+
+        label3 = Label(frame, text="Prosti brojevi")
+        label3.pack()
+
+        var4 = StringVar()
+        var5 = StringVar()
+        var6 = StringVar()
+        var7 = StringVar()
+        label4 = Label(frame3, textvariable=var5)
+        label4.pack()
+        label5 = Label(frame3, textvariable=var6)
+        label5.pack()
+        label6 = Label(frame3, textvariable=var7)
+        label6.pack()
+        frame3.pack(anchor=E)
+        frame4 = Frame(root, width=300, height=300, bg="blue")
+
+        var8 = StringVar()
+        label6 = Label(frame4, textvariable=var8)
+
+        def apiPoziv():
+            response = requests.get("https://www.boredapi.com/api/activity")
+            if response.status_code == 200:
+                data = response.json()
+                var8.set(str(data['activity']))
+            else:
+                print("Error:", response.status_code)
+
+        label6.pack()
+        btn4 = Button(frame4, text="api poziv", command=apiPoziv)
+        btn4.pack()
+        frame4.pack()
+
+        def prostiBrojevi():
+            selection = int(var4.get())
+            if selection < 1:
+                return
+            nums = range(2, selection)
+            for i in range(2, selection):
+                nums = list(filter(lambda x: x == i or x % i, nums))
+            var5.set(str(nums))
+            nums2 = list(range(0, selection))
+            nums2 = list(map(lambda x: x ** 2, nums2))
+            var6.set("Prosti brojevi na kvadrat-->" + str(nums2))
+
+            nums3 = reduce(lambda x, y: x + y, list(range(1, selection)))
+            var7.set("Suma prostih brojeva" + str(nums3))
+
+        Scala2 = Scale(frame, from_=0, to=100, variable=var4, orient=HORIZONTAL)
+        Scala2.pack(padx=5, pady=5)
+
+        btn4 = Button(frame3, text="prosti brojevi generator", command=lambda: prostiBrojevi())
+        btn4.pack()
+
     def loptica(self):
         canvas = Canvas(root, width=500, height=500, bg="green")
         canvas.pack()
@@ -146,16 +190,16 @@ class Prozor():
             canvas.move(arc, deltaX, deltaY)
             if canvas.coords(arc)[2] >= 500:
                 deltaX = -1
-                deltaY = math.sin(round(random.randint(-360, 360), 1))
+                deltaY = math.sin(random.randint(-360, 360))
             if canvas.coords(arc)[0] <= 0:
                 deltaX = 1
-                deltaY = math.sin(round(random.randint(-360, 360), 1))
+                deltaY = math.sin(random.randint(-360, 360))
             if canvas.coords(arc)[3] >= 500:
                 deltaY = -1
-                deltaX = math.cos(round(random.randint(-360, 360), 1))
+                deltaX = math.cos(random.randint(-360, 360))
             if canvas.coords(arc)[1] <= 0:
                 deltaY = 1
-                deltaX = math.cos(round(random.randint(-360, 360), 1))
+                deltaX = math.cos(random.randint(-360, 360))
 
 
 root = Tk()
@@ -165,28 +209,10 @@ prozor = Prozor(root, response, message)
 server_thread = threading.Thread(target=start_server)
 server_thread.setDaemon(True)
 server_thread.start()
-lopticaNit= threading.Thread(target=prozor.loptica)
+lopticaNit = threading.Thread(target=prozor.loptica)
 lopticaNit.setDaemon(True)
 lopticaNit.start()
 
 root.geometry("900x1000")
 
 root.mainloop()
-numbers = [1, 2, 3, 4, 5]
-
-squared = map(lambda x: x**2, numbers)
-print(list(squared))
-
-numbers = [1, 2, 3, 4, 5]
-
-even = filter(lambda x: x & 1 == 0, numbers)
-print(list(even))
-
-
-from functools import reduce
-
-numbers = [1, 2, 3, 4, 5]
-
-product = reduce(lambda x, y: x * y, numbers)
-print(product)
-Json()
