@@ -7,7 +7,6 @@ import random
 import sqlite3
 from functools import *
 import requests
-
 message = ""
 response = ""
 
@@ -48,6 +47,8 @@ def posalji_serveru():
     global conn, cursor
     global message
     message = en.get()
+    if len(message) < 1:
+        return
     start_client()
     conn = sqlite3.connect('domaci.db')
     cursor = conn.cursor()
@@ -76,6 +77,7 @@ def kreirajSql_upit():
     file.close()
     cursor.close()
     conn.close()
+
 
 
 class Prozor():
@@ -114,39 +116,42 @@ class Prozor():
         btn3 = Button(frame2, text="KreirajSqlIDatoteku", command=kreirajSql_upit)
         btn3.pack(side=RIGHT)
 
-        frame3 = Frame(root, width=300, height=100, bg="yellow")
+        frame3 = Frame(root, width=300, height=100)
 
-        label3 = Label(frame, text="Prosti brojevi")
+        label3 = Label(frame3, text="Prosti brojevi")
         label3.pack()
 
-        var4 = StringVar()
+        var4 = DoubleVar()
         var5 = StringVar()
         var6 = StringVar()
         var7 = StringVar()
-        label4 = Label(frame3, textvariable=var5)
-        label4.pack()
-        label5 = Label(frame3, textvariable=var6)
-        label5.pack()
-        label6 = Label(frame3, textvariable=var7)
-        label6.pack()
-        frame3.pack(anchor=E)
-        frame4 = Frame(root, width=300, height=300, bg="blue")
-
         var8 = StringVar()
-        label6 = Label(frame4, textvariable=var8)
+        label4 = Label(frame3, width=110, textvariable=var5, bg="green", foreground="white")
+        label4.pack()
+        label5 = Label(frame3, width=110, height=5, textvariable=var6, bg="red", foreground="white")
+        label5.pack()
+        label6 = Label(frame3, width=110, textvariable=var7, bg="blue", foreground="white")
+        label6.pack()
+        frame3.pack(anchor=CENTER)
+        frame4 = Frame(root, width=300, height=300)
+        label7 = Label(frame4, textvariable=var8, bg="blue", foreground="white")
+        label7.pack()
 
         def apiPoziv():
-            response = requests.get("https://www.boredapi.com/api/activity")
-            if response.status_code == 200:
-                data = response.json()
-                var8.set(str(data['activity']))
-            else:
-                print("Error:", response.status_code)
-
-        label6.pack()
-        btn4 = Button(frame4, text="api poziv", command=apiPoziv)
+            url = "https://www.boredapi.com/api/activity"
+            response = requests.get(url)
+            data = response.json()
+            var8.set(data['activity'])
+        btn4 = Button(frame4, text="api poziv", command=lambda :threading.Thread(target=apiPoziv).start())
         btn4.pack()
         frame4.pack()
+        def rezultaltUdvaReda(res):
+            novi = ""
+            for i ,elem in enumerate(res):
+                novi += elem
+                if i % 140-1 == 0:
+                    novi += "\n"
+            return novi
 
         def prostiBrojevi():
             selection = int(var4.get())
@@ -158,12 +163,17 @@ class Prozor():
             var5.set(str(nums))
             nums2 = list(range(0, selection))
             nums2 = list(map(lambda x: x ** 2, nums2))
-            var6.set("Prosti brojevi na kvadrat-->" + str(nums2))
+            temp = "Prosti brojevi na kvadrat-->" + str(nums2)
+
+
+            if len(temp)> 150:
+                temp = rezultaltUdvaReda(temp)
+            var6.set(temp)
 
             nums3 = reduce(lambda x, y: x + y, list(range(1, selection)))
             var7.set("Suma prostih brojeva" + str(nums3))
 
-        Scala2 = Scale(frame, from_=0, to=100, variable=var4, orient=HORIZONTAL)
+        Scala2 = Scale(frame3, from_=0, to=100, variable=var4, orient=HORIZONTAL)
         Scala2.pack(padx=5, pady=5)
 
         btn4 = Button(frame3, text="prosti brojevi generator", command=lambda: prostiBrojevi())
@@ -203,7 +213,6 @@ class Prozor():
 
 
 root = Tk()
-
 en = StringVar()
 prozor = Prozor(root, response, message)
 server_thread = threading.Thread(target=start_server)
