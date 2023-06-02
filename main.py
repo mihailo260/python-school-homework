@@ -170,7 +170,7 @@ class Prozor():
                 temp = rezultaltUdvaReda(temp)
             var6.set(temp)
 
-            nums3 = reduce(lambda x, y: x + y, list(range(1, selection)))
+            nums3 = reduce(lambda x, y: x + y, nums)
             var7.set("Suma prostih brojeva" + str(nums3))
 
         Scala2 = Scale(frame3, from_=0, to=100, variable=var4, orient=HORIZONTAL)
