@@ -7,6 +7,7 @@ import random
 import sqlite3
 from functools import *
 import requests
+
 message = ""
 response = ""
 
@@ -79,7 +80,6 @@ def kreirajSql_upit():
     conn.close()
 
 
-
 class Prozor():
     def __init__(self, root, response, message):
         self.root = root
@@ -126,11 +126,11 @@ class Prozor():
         var6 = StringVar()
         var7 = StringVar()
         var8 = StringVar()
-        label4 = Label(frame3, width=110, textvariable=var5, bg="green", foreground="white")
+        label4 = Label(frame3, width=110, height=2, textvariable=var5, bg="red", foreground="white")
         label4.pack()
-        label5 = Label(frame3, width=110, height=5, textvariable=var6, bg="red", foreground="white")
+        label5 = Label(frame3, width=110, height=5, textvariable=var6, bg="blue", foreground="white")
         label5.pack()
-        label6 = Label(frame3, width=110, textvariable=var7, bg="blue", foreground="white")
+        label6 = Label(frame3, width=110, height=2, textvariable=var7, bg="white", foreground="black")
         label6.pack()
         frame3.pack(anchor=CENTER)
         frame4 = Frame(root, width=300, height=300)
@@ -142,14 +142,16 @@ class Prozor():
             response = requests.get(url)
             data = response.json()
             var8.set(data['activity'])
-        btn4 = Button(frame4, text="api poziv", command=lambda :threading.Thread(target=apiPoziv).start())
-        btn4.pack()
+
+        btn6 = Button(frame4, text="api poziv", command=lambda: threading.Thread(target=apiPoziv).start())
+        btn6.pack()
         frame4.pack()
+
         def rezultaltUdvaReda(res):
             novi = ""
-            for i ,elem in enumerate(res):
+            for i, elem in enumerate(res):
                 novi += elem
-                if i % 140-1 == 0:
+                if i % 140 - 1 == 0:
                     novi += "\n"
             return novi
 
@@ -164,23 +166,39 @@ class Prozor():
             nums2 = list(range(0, selection))
             nums2 = list(map(lambda x: x ** 2, nums2))
             temp = "Prosti brojevi na kvadrat-->" + str(nums2)
-
-
-            if len(temp)> 150:
+            if len(temp) > 150:
                 temp = rezultaltUdvaReda(temp)
             var6.set(temp)
 
-            nums3 = reduce(lambda x, y: x + y, nums)
+            nums3 = reduce(lambda x, y: x + y, list(range(1, selection)))
             var7.set("Suma prostih brojeva" + str(nums3))
 
         Scala2 = Scale(frame3, from_=0, to=100, variable=var4, orient=HORIZONTAL)
         Scala2.pack(padx=5, pady=5)
 
-        btn4 = Button(frame3, text="prosti brojevi generator", command=lambda: prostiBrojevi())
-        btn4.pack()
+        btn7 = Button(frame3, text="prosti brojevi generator", command=lambda: prostiBrojevi())
+        btn7.pack()
+        label8 = Label(frame3, text='kordinate =>((1, 2), (3, 4), (5, 6), (7, 8))')
+        label8.pack()
+        var9 = StringVar()
+        label9 = Label(frame3, textvariable=var9)
+        label9.pack()
+
+        def udaljenost():
+            kordinate = ((1, 2), (3, 4), (5, 6), (7, 8))
+            nasumicneKordinate = random.sample(kordinate, 2)
+            x1, y1 = nasumicneKordinate[0]
+            x2, y2 = nasumicneKordinate[1]
+            udaljenost = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+            udaljenost = round(udaljenost, 2)
+            var9.set(f"Udaljenost izmedju {nasumicneKordinate[0]} i {nasumicneKordinate[1]} :" + str(udaljenost))
+
+        btn5 = Button(frame3, text="izracunaj udaljenost nasumicno odabranih kordinata", command=udaljenost)
+        btn5.pack()
 
     def loptica(self):
-        canvas = Canvas(root, width=500, height=500, bg="green")
+        boje = ["green", "Maroon", "yellow", "LightBlue", "Lime", "Brown", "Crimson"]
+        canvas = Canvas(root, width=400, height=400, bg="green")
         canvas.pack()
         deltaX = 1
         deltaY = 0
@@ -193,21 +211,36 @@ class Prozor():
         kordinataX2 = centarKrugaX + poluprecnikKruga
         kordinataY2 = centarKrugaY + poluprecnikKruga
 
-        arc = canvas.create_arc(kordinataX1, kordinataY1, kordinataX2, kordinataY2, start=0, extent=359,
-                                fill="red")
+        arc = canvas.create_oval(kordinataX1, kordinataY1, kordinataX2, kordinataY2,fill="red")
         while True:
             time.sleep(1 / (10 * 100))
             canvas.move(arc, deltaX, deltaY)
-            if canvas.coords(arc)[2] >= 500:
+            if canvas.coords(arc)[2] >= 400:
+                boja = random.choice(boje)
+                while canvas.cget("background") == boja:
+                    boja = random.choice(boje)
+                canvas.config(bg=random.choice(boje))
                 deltaX = -1
                 deltaY = math.sin(random.randint(-360, 360))
             if canvas.coords(arc)[0] <= 0:
+                boja = random.choice(boje)
+                while canvas.cget("background") == boja:
+                    boja = random.choice(boje)
+                canvas.config(bg=random.choice(boje))
                 deltaX = 1
                 deltaY = math.sin(random.randint(-360, 360))
-            if canvas.coords(arc)[3] >= 500:
+            if canvas.coords(arc)[3] >= 400:
+                boja = random.choice(boje)
+                while canvas.cget("background") == boja:
+                    boja = random.choice(boje)
+                canvas.config(bg=random.choice(boje))
                 deltaY = -1
                 deltaX = math.cos(random.randint(-360, 360))
             if canvas.coords(arc)[1] <= 0:
+                boja = random.choice(boje)
+                while canvas.cget("background") == boja:
+                    boja = random.choice(boje)
+                canvas.config(bg=random.choice(boje))
                 deltaY = 1
                 deltaX = math.cos(random.randint(-360, 360))
 
