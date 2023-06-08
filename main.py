@@ -15,7 +15,7 @@ conn, cursor = "", ""
 
 
 def start_server():
-    global message, response, ID
+    global message, response
     server_host = "localhost"
     server_port = 12345
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -55,8 +55,7 @@ def posalji_serveru():
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS COMPANY
                         (
-                        NAME TEXT NOT NULL);'''
-                   )
+                        NAME TEXT NOT NULL);''')
     print(message)
     conn.execute("INSERT INTO COMPANY (NAME) VALUES (?)", (message,))
     conn.commit()
@@ -117,9 +116,6 @@ class Prozor():
         btn3.pack(side=RIGHT)
 
         frame3 = Frame(root, width=300, height=100)
-
-        label3 = Label(frame3, text="Prosti brojevi")
-        label3.pack()
 
         var4 = DoubleVar()
         var5 = StringVar()
@@ -211,7 +207,7 @@ class Prozor():
         kordinataX2 = centarKrugaX + poluprecnikKruga
         kordinataY2 = centarKrugaY + poluprecnikKruga
 
-        arc = canvas.create_oval(kordinataX1, kordinataY1, kordinataX2, kordinataY2,fill="red")
+        arc = canvas.create_oval(kordinataX1, kordinataY1, kordinataX2, kordinataY2, fill="red")
         while True:
             time.sleep(1 / (10 * 100))
             canvas.move(arc, deltaX, deltaY)
@@ -221,28 +217,28 @@ class Prozor():
                     boja = random.choice(boje)
                 canvas.config(bg=random.choice(boje))
                 deltaX = -1
-                deltaY = math.sin(random.randint(-360, 360))
+                deltaY = math.sin(random.randint(0, 360))
             if canvas.coords(arc)[0] <= 0:
                 boja = random.choice(boje)
                 while canvas.cget("background") == boja:
                     boja = random.choice(boje)
                 canvas.config(bg=random.choice(boje))
                 deltaX = 1
-                deltaY = math.sin(random.randint(-360, 360))
+                deltaY = math.sin(random.randint(0, 360))
             if canvas.coords(arc)[3] >= 400:
                 boja = random.choice(boje)
                 while canvas.cget("background") == boja:
                     boja = random.choice(boje)
                 canvas.config(bg=random.choice(boje))
                 deltaY = -1
-                deltaX = math.cos(random.randint(-360, 360))
+                deltaX = math.cos(random.randint(0, 360))
             if canvas.coords(arc)[1] <= 0:
                 boja = random.choice(boje)
                 while canvas.cget("background") == boja:
                     boja = random.choice(boje)
                 canvas.config(bg=random.choice(boje))
                 deltaY = 1
-                deltaX = math.cos(random.randint(-360, 360))
+                deltaX = math.cos(random.randint(0, 360))
 
 
 root = Tk()
